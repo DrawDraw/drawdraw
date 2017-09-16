@@ -1,3 +1,26 @@
+# API
+## POST /v1/images
+form 
+
+|*fields*|*description*|
+|---|---|
+|file|image to upload|
+
+### curl
+```
+curl \
+  -F "file=@/Users/cwnga/Desktop/git/DrawDraw/DrawDrawBackend/drawdraw/test.jpg" \
+  http://localhost:5000/v1/images
+
+```
+### html
+```
+<form action="/v1/images" enctype="multipart/form-data" method="post">
+  <input type="file" name="upload" multiple="multiple"><br>
+  <input type="submit" value="Upload">
+</form>
+```
+
 # node-js-getting-started
 
 A barebones Node.js app using [Express 4](http://expressjs.com/).

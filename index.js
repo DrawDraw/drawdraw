@@ -1,5 +1,8 @@
 var express = require('express');
 var app = express();
+var upload = require('./routes/image/upload');
+app.use('/v1/images', upload);
+
 
 app.set('port', (process.env.PORT || 5000));
 
