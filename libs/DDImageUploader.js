@@ -1,5 +1,5 @@
-var imageUploader = {};
-imageUploader.uploadImage = function (imagePath, callback) {
+var DDImageUploader = {};
+DDImageUploader.uploadImage = function (imagePath, callback) {
     var Flickr = require("flickrapi");
     var apiKey = process.env.FLICKR_API_KEY; 
     var secret = process.env.FLICKR_SECRET;
@@ -51,5 +51,5 @@ imageUploader.uploadImage = function (imagePath, callback) {
       });
     });
 }
-module.exports = imageUploader;
+module.exports = DDImageUploader;
 
