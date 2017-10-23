@@ -1,3 +1,3 @@
-var imageUploader = require('../libs/DDImageUploader.js');
-imageUploader.uploadImage("./test.jpg", function (err, result) { console.log(err); console.log(result)});
+var imageUploader = require(__dirname + '/../libs/DDImageUploader.js');
+imageUploader.uploadImage(__dirname + "/test.jpg", function (err, result) { console.log(err); console.log(result)});
 console.log(__dirname);
