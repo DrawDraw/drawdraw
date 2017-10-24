@@ -1,8 +1,10 @@
 var express = require('express');
 var app = express();
 var upload = require(__dirname + '/routes/api/v1/image/upload'); //image upload
+var webLogin = require(__dirname + '/routes/web/login'); //image upload
+
 app.use('/api/v1/images', upload);
-app.use('/web/login', upload);
+app.use('/web/login', webLogin);
 
 app.set('port', (process.env.PORT || 5000));
 
