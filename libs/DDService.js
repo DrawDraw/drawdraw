@@ -33,3 +33,5 @@ DDService.getUser = function (token, type/*facebook*/, callback/* function(dderr
         return;
     }
 };
+
+module.exports = DDService;
