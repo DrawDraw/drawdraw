@@ -15,7 +15,7 @@ DDFacebookClient.getUserIdAndName = function (token, callback/* function(error, 
                 if (error) {
                     callback(error, null);
                 } else if (response && response.statusCode && (response.statusCode >= 200 && response.statusCode < 400)) {
-                    callback(null, body);
+                    callback(null,  JSON.parse(body));
                 } else {
                     callback(new Error("get data fail"), null);
                 }
