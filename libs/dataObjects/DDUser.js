@@ -1,4 +1,6 @@
-var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeStamp) {
+var DDFacebookClient = require(__dirname + '/../clients/DDFacebookClient.js'); 
+var DDError = require(__dirname + '/./DDError.js'); 
+var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeStamp) {//{{{
     this.id = id;//string
     this.name = name;//string
     this.imageUrl = imageUrl;//string
@@ -6,7 +8,6 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
     this.externalId = externalId;//string
     this.createTimeStamp = createTimeStamp;//
     this.createTime =  function() {
-    console.log(typeof(this.createTimeStamp));
        if (this.createTimeStamp) {
            var d = new Date(this.createTimeStamp);
            var n = d.toISOString();
@@ -35,32 +36,32 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
         const values = [this.name, this.imageUrl, this.id];
         client.query(text, values, (err, res) => {
             if (err) {
-                callback(DDError.create(DDError.ERRORCODE_SYSTEM, "DB WRITE USER FAIL"), null);
+                callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB WRITE USER FAIL"), null);
             } else {
                 callback(err, true);
             }
             client.end();
         });
     }
-}
+}//}}}
 
 //class methods
 DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(err, dduser)*/) 
 {//{{{
 	if (name.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "name.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "name.length = 0"), false);
 		return;
 	}
 	if (imageUrl.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "imageUrl.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "imageUrl.length = 0"), false);
 		return;
 	}
 	if (externalType.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "externalType.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType.length = 0"), false);
 		return;
 	}
 	if (externalId.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "externalId.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalId.length = 0"), false);
 		return;
     }
     const { Client } = require('pg');
@@ -76,8 +77,7 @@ DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(
     const values = [time, name, imageUrl, externalType, externalId, time];
     client.query(text, values, (err, res) => {
         if (err) {
-            console.log(err);
-            callback(DDError.create(DDError.ERRORCODE_SYSTEM, "DB WRITE USER FAIL"), null);
+            callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB READ USER FAIL"), null);
         } else {
             callback(err, new DDUser(time,name, imageUrl, externalType, externalId, time));
         }
@@ -85,10 +85,10 @@ DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(
     });
 }//}}}
 
-DDUser.queryById = function (id, callback /*(err, dduser)*/) 
+DDUser.queryWithId = function (id, callback /*(err, dduser)*/) 
 {//{{{
 	if (id.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "id.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "id.length = 0"), false);
 		return;
 	}
     const { Client } = require('pg');
@@ -101,24 +101,27 @@ DDUser.queryById = function (id, callback /*(err, dduser)*/)
     const values = [id];
     client.query(text, values, (err, res) => {
         if (err) {
-            console.log(err);
-            callback(DDError.create(DDError.ERRORCODE_SYSTEM, "DB WRITE USER FAIL"), null);
+            callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB READ USER FAIL"), null);
         } else {
-        var userDBJSON = res.rows[0];
-            callback(err, new DDUser(userDBJSON.id ,userDBJSON.name, userDBJSON.imageurl, userDBJSON.externaltype, userDBJSON.externalid, Number(userDBJSON.createtime)));
+            var userDBJSON = res.rows[0];
+            if (userDBJSON) {
+                callback(err, new DDUser(userDBJSON.id ,userDBJSON.name, userDBJSON.imageurl, userDBJSON.externaltype, userDBJSON.externalid, Number(userDBJSON.createtime)));
+            } else {
+                callback(new DDError(DDUser.ERROR_USER_NOT_FOUND, "USER NOT FOUND"), null);
+            }
         }
         client.end();
     });
 }//}}}
 
-DDUser.queryByExternalTypeAndExternalId = function (externalType, externalId, callback /*(err, dduser)*/) 
+DDUser.queryWithExternalInfo = function (externalType, externalId, callback /*(err, dduser)*/) 
 {//{{{
 	if (externalType.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "externalType.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType.length = 0"), false);
 		return;
 	}
 	if (externalId.length == 0) {
-		callback(DDError.create(DDError.ERRORCODE_VALIDATE, "externalId.length = 0"), false);
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalId.length = 0"), false);
 		return;
 	}
     const { Client } = require('pg');
@@ -131,18 +134,49 @@ DDUser.queryByExternalTypeAndExternalId = function (externalType, externalId, ca
     const values = [externalType, externalId];
     client.query(text, values, (err, res) => {
         if (err) {
-            console.log(err);
-            callback(DDError.create(DDError.ERRORCODE_SYSTEM, "DB WRITE USER FAIL"), null);
+            callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB READ USER FAIL"), null);
         } else {
-        var userDBJSON = res.rows[0];
-            callback(err, new DDUser(userDBJSON.id ,userDBJSON.name, userDBJSON.imageurl, userDBJSON.externaltype, userDBJSON.externalid, Number(userDBJSON.createtime)));
+            var userDBJSON = res.rows[0];
+            if (userDBJSON) {
+                callback(err, new DDUser(userDBJSON.id ,userDBJSON.name, userDBJSON.imageurl, userDBJSON.externaltype, userDBJSON.externalid, Number(userDBJSON.createtime)));
+            } else {
+                callback(new DDError(DDUser.ERROR_USER_NOT_FOUND, "USER NOT FOUND"), null);
+            }
         }
+
+
         client.end();
     });
 }//}}}
 
+DDUser.queryWithTokenAndExternalType = function (token, externalType, callback /*(err, dduser)*/) 
+{//{{{
+	if (token.length == 0) {
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "token.length = 0"), false);
+		return;
+	}
+    if (externalType == "facebook") {
+        DDFacebookClient.getUserIdAndName(token, function (error, userRes) {
+            if (error) {
+                callback(new DDError(DDUser.ERROR_EXTERNAL_SERVICE_FAIL, error.message), null);
+                return;
+            }
+            DDUser.queryWithExternalInfo(externalType, userRes.id, function (ddError, ddUser) {
+                if (ddError) {
+                    callback(new DDError(ddError, null));
+                } else {
+                    callback(null, ddUser);
+                }
+            });
+        });
+    } else {
+        callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType "+ externalType +" not support"), null);
+    }
+}//}}}
 
-
-
-
+//error
+DDUser.ERROR_USER_NOT_FOUND = "EU001";
+DDUser.ERROR_USER_DB_FAIL = "EU002";
+DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL = "EU003";
+DDUser.ERROR_EXTERNAL_SERVICE_FAIL = "EU004";
 module.exports = DDUser;
