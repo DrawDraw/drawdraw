@@ -1,37 +1,34 @@
-var DDFacebookClient = require(__dirname + '/./clients/DDFacebookClient.js'); 
-var DDUser = require(__dirname + '/../models/DDUser.js'); 
-var DDError = require(__dirname + '/../models/DDError.js'); 
+var DDUser = require(__dirname + "/dataObjects/DDUser.js")
 var DDService = {};
 
-DDService.getUser = function (token, type/*facebook*/, callback/* function(dderror, dduser) */) {
-    if (!token || token.length == 0) {
-        callback(DDError.create(DDError.ERRORCODE_VALIDATE, "token validate fail"), null);
-        return;
-    }
-    if (!type || type.length == 0) {
-        callback(DDError.create(DDError.ERRORCODE_VALIDATE, "type validate fail"), null);
-        return;
-    }
+DDService.getUserWithExternalType = function (token, externalType/*facebook*/, callback/* function(dderror, dduser) */) {
+    DDUser.queryWithTokenAndExternalType(token, externalType, function(ddError, ddUser) {
+        var errorJSON;
+        var userJSON;
+        if (ddError) {
+            errorJSON = ddError.toJSON();
+        } 
+        if (ddUser) {
 
-    if (type === "facebook") {
-        DDFacebookClient.getUserIdAndName(token, function (error, userRes) {
-            if (error) {
-                callback(DDError.create(DDError.ERRORCODE_SYSTEM, error.message), null);
-                return;
-            }
-            DDFacebookClient.getUserPicture(token, function (error, imageRes) {
-                if (error) {
-                    callback(DDError.create(DDError.ERRORCODE_SYSTEM, error.message), null);
-                    return;
-                } else {
-                    callback(null, DDUser.create(userRes.id, userRes.name, imageRes.url));
-                }
-            });
-        });
-    } else {
-        callback(DDError.create(DDError.ERRORCODE_VALIDATE, "type "+type+" not support"), null);
-        return;
-    }
+            userJSON = ddUser.toJSON();
+        } 
+        callback(errorJSON, userJSON);
+    });
+};
+
+DDService.getUserWithId = function (id, callback/* function(dderror, dduser) */) {
+    DDUser.queryWithId(id, function(ddError, ddUser) {
+        var errorJSON;
+        var userJSON;
+        if (ddError) {
+            errorJSON = ddError.toJSON();
+        } 
+        if (ddUser) {
+
+            userJSON = ddUser.toJSON();
+        } 
+        callback(errorJSON, userJSON);
+    });
 };
 
 module.exports = DDService;
