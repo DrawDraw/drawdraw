@@ -46,6 +46,35 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
 }//}}}
 
 //class methods
+DDUser.createWithExternalInfo = function (token, externalType, callback /*(err, dduser)*/) 
+{//{{{
+	if (token.length == 0) {
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "token.length = 0"), false);
+		return;
+	}
+	if (externalType.length == 0) {
+		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType.length = 0"), false);
+		return;
+	}
+    if (externalType == "facebook") {
+        DDFacebookClient.getUserIdAndName(token, function (error, userRes) {
+            if (error) {
+                callback(new DDError(DDUser.ERROR_EXTERNAL_SERVICE_FAIL, error.message), null);
+                return;
+            }
+            DDFacebookClient.getUserPicture(token, function(userPicErr, userPicJSON) {
+                var userId = userRes.id;
+                var userName = userRes.name;
+                var userImageUrl = userPicJSON.url;
+                DDUser.create(userName, userImageUrl, externalType, userId, callback);
+            });
+        });
+    } else {
+        callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType "+ externalType +" not support"), null);
+    }
+
+}//}}}
+
 DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(err, dduser)*/) 
 {//{{{
 	if (name.length == 0) {
