@@ -1,7 +1,7 @@
 var DDUser = require(__dirname + "/dataObjects/DDUser.js")
 var DDService = {};
 
-DDService.getUserWithExternalType = function (token, externalType/*facebook*/, callback/* function(dderror, dduser) */) {
+DDService.getUserWithExternalType = function (token, externalType/*facebook*/, callback/* function(dderror, dduser) */) {//{{{
     DDUser.queryWithTokenAndExternalType(token, externalType, function(ddError, ddUser) {
         var errorJSON;
         var userJSON;
@@ -14,9 +14,8 @@ DDService.getUserWithExternalType = function (token, externalType/*facebook*/, c
         } 
         callback(errorJSON, userJSON);
     });
-};
-
-DDService.getUserWithId = function (id, callback/* function(dderror, dduser) */) {
+};//}}}
+DDService.getUserWithId = function (id, callback/* function(dderror, dduser) */) {//{{{
     DDUser.queryWithId(id, function(ddError, ddUser) {
         var errorJSON;
         var userJSON;
@@ -24,11 +23,26 @@ DDService.getUserWithId = function (id, callback/* function(dderror, dduser) */)
             errorJSON = ddError.toJSON();
         } 
         if (ddUser) {
+            userJSON = ddUser.toJSON();
+        } 
+        callback(errorJSON, userJSON);
 
+    });
+};//}}}
+
+DDService.createUserWithExternalInfo = function(token, externalType, callback) {
+    DDUser.createWithExternalInfo(token, externalType, function (dderror, dduser) {
+        var errorJSON;
+        var userJSON;
+        if (ddError) {
+            errorJSON = ddError.toJSON();
+        } 
+        if (ddUser) {
             userJSON = ddUser.toJSON();
         } 
         callback(errorJSON, userJSON);
     });
-};
 
+    return ;
+}
 module.exports = DDService;
