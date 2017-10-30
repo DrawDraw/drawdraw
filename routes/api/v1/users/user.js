@@ -1,37 +1,38 @@
 var express = require('express');
 var router = express.Router();
+var jsonBody = require("body/json")
 var service = require(__dirname + '/../../../../libs/DDService.js');
 
 /* GET home page. */
 router.get('/me', function(req, res, next) {
-    service.getUserWithExternalType(req.query.token, req.query.type, function(ddError, ddUser) {
-        if (ddError) {
+    service.getUserWithExternalType(req.query.token, req.query.type, function(ddErrorJSON, ddUserJSON) {
+        if (ddErrorJSON) {
             res.setHeader('Content-Type', 'application/json');
-            res.status(400).json(ddError);
+            res.status(400).json(ddErrorJSON);
         } else {
             res.setHeader('Content-Type', 'application/json');
-            res.status(200).json(ddUser);
+            res.status(200).json(ddUserJSON);
         }
     });
 });
 
 router.get('/:userId', function(req, res, next) {
-    service.getUserWithId(req.params.userId,  function(ddError, ddUser) {
-        if (ddError) {
+    service.getUserWithId(req.params.userId,  function(ddErrorJSON, ddUserJSON) {
+        if (ddErrorJSON) {
            res.setHeader('Content-Type', 'application/json');
-           res.status(400).json(ddError);
+           res.status(400).json(ddErrorJSON);
            return;
         }
-        if (ddUser.id !== req.params.userId) {
+        if (ddUserJSON.id !== req.params.userId) {
             res.setHeader('Content-Type', 'application/json');
-            res.status(400).json(ddError.create(ddError.ERRORCODE_VALIDATE, "user not belong this userId"));
+            res.status(400).json(ddErrorJSON);
         } else {
-            if (ddError) {
+            if (ddErrorJSON) {
                 res.setHeader('Content-Type', 'application/json');
-                res.status(400).json(ddError);
+                res.status(400).json(ddErrorJSON);
             } else {
                 res.setHeader('Content-Type', 'application/json');
-                res.status(200).json(ddUser);
+                res.status(200).json(ddUserJSON);
             }
         }
     });
