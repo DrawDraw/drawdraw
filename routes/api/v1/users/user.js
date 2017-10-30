@@ -38,4 +38,25 @@ router.get('/:userId', function(req, res, next) {
     });
 });
 
+router.post('/', function(req, res, next) {
+    //token, externalType
+    jsonBody(req, res, function (parseError, json) {
+        res.setHeader('Content-Type', 'application/json');
+        var token = req.query.token;
+        var externalType;
+        if (json.externalType) {
+            externalType = json.externalType;
+        }
+        service.createUserWithExternalInfo(token, externalType, function(ddErrorJSON, ddUserJSON) {
+            if (ddErrorJSON) {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(400).json(ddErrorJSON);
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).json(ddUserJSON);
+            }
+        });
+    });
+});
+
 module.exports = router;
