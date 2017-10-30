@@ -31,7 +31,7 @@ DDService.getUserWithId = function (id, callback/* function(dderror, dduser) */)
 };//}}}
 
 DDService.createUserWithExternalInfo = function(token, externalType, callback) {
-    DDUser.createWithExternalInfo(token, externalType, function (dderror, dduser) {
+    DDUser.createWithExternalInfo(token, externalType, function (ddError, ddUser) {
         var errorJSON;
         var userJSON;
         if (ddError) {

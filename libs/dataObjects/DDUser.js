@@ -48,11 +48,11 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
 //class methods
 DDUser.createWithExternalInfo = function (token, externalType, callback /*(err, dduser)*/) 
 {//{{{
-	if (token.length == 0) {
+	if (!token || token.length == 0) {
 		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "token.length = 0"), false);
 		return;
 	}
-	if (externalType.length == 0) {
+	if (!externalType || externalType.length == 0) {
 		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType.length = 0"), false);
 		return;
 	}
