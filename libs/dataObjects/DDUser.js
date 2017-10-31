@@ -93,24 +93,30 @@ DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(
 		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalId.length = 0"), false);
 		return;
     }
-    const { Client } = require('pg');
-    const client = new Client({
-                        connectionString: process.env.DATABASE_URL,
-                        ssl: true,
-                       });
-    client.connect();
-    var d = new Date();
-    var time = d.getTime();
+    DDUser.queryWithExternalInfo(externalType, externalId, function(ddError, ddUser) {
+        if (ddError && ddError.code == DDUser.ERROR_USER_NOT_FOUND) {
+            const { Client } = require('pg');
+            const client = new Client({
+                                connectionString: process.env.DATABASE_URL,
+                                ssl: true,
+                               });
+            client.connect();
+            var d = new Date();
+            var time = d.getTime();
 
-    const text = 'INSERT INTO users(id, name, imageUrl, externalType, externalId, createTime) VALUES($1, $2, $3, $4, $5, $6);'
-    const values = [time, name, imageUrl, externalType, externalId, time];
-    client.query(text, values, (err, res) => {
-        if (err) {
-            callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB READ USER FAIL"), null);
-        } else {
-            callback(err, new DDUser(time,name, imageUrl, externalType, externalId, time));
+            const text = 'INSERT INTO users(id, name, imageUrl, externalType, externalId, createTime) VALUES($1, $2, $3, $4, $5, $6);'
+            const values = [time, name, imageUrl, externalType, externalId, time];
+            client.query(text, values, (err, res) => {
+                if (err) {
+                    callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB READ USER FAIL"), null);
+                } else {
+                    callback(null, new DDUser(time,name, imageUrl, externalType, externalId, time));
+                }
+                client.end();
+            });
+        } else if (ddUser) {
+            callback(null, ddUser);
         }
-        client.end();
     });
 }//}}}
 
