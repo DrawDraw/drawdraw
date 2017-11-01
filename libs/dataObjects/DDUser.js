@@ -7,7 +7,7 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
     this.externalType = externalType;//string
     this.externalId = externalId;//string
     this.createTimeStamp = createTimeStamp;//
-    this.createTime =  function() {
+    this.createTime =  function () {
        if (this.createTimeStamp) {
            var d = new Date(this.createTimeStamp);
            var n = d.toISOString();
@@ -15,7 +15,7 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
        }
        return null;
     }
-    this.toJSON = function() {
+    this.toJSON = function () {
        return {
         id: this.id,//string
         name: this.name,//string
@@ -25,7 +25,7 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
         createTime: this.createTime()
        };
     }
-    this.save = function(callback/*dderror, res(BOOL) */ ) {
+    this.save = function (callback/*dderror, res(BOOL) */ ) {
         const { Client } = require('pg');
         const client = new Client({
                             connectionString: process.env.DATABASE_URL,
@@ -62,7 +62,7 @@ DDUser.createWithExternalInfo = function (token, externalType, callback /*(err, 
                 callback(new DDError(DDUser.ERROR_EXTERNAL_SERVICE_FAIL, error.message), null);
                 return;
             }
-            DDFacebookClient.getUserPicture(token, function(userPicErr, userPicJSON) {
+            DDFacebookClient.getUserPicture(token, function (userPicErr, userPicJSON) {
                 var userId = userRes.id;
                 var userName = userRes.name;
                 var userImageUrl = userPicJSON.url;
@@ -93,7 +93,7 @@ DDUser.create = function (name, imageUrl, externalType, externalId, callback /*(
 		callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalId.length = 0"), false);
 		return;
     }
-    DDUser.queryWithExternalInfo(externalType, externalId, function(ddError, ddUser) {
+    DDUser.queryWithExternalInfo(externalType, externalId, function (ddError, ddUser) {
         if (ddError && ddError.code == DDUser.ERROR_USER_NOT_FOUND) {
             const { Client } = require('pg');
             const client = new Client({
@@ -208,8 +208,9 @@ DDUser.queryWithTokenAndExternalType = function (token, externalType, callback /
         callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType "+ externalType +" not support"), null);
     }
 }//}}}
-DDUser.updateWithTokenAndExternalType = function(token, externalType, userJSON, callback /*(err, dduser)*/) 
-{
+
+DDUser.updateWithTokenAndExternalType = function (token, externalType, userJSON, callback /*(err, dduser)*/) 
+{//{{{
     DDUser.queryWithTokenAndExternalType(token, externalType, function (ddError, ddUser) {
         if (ddUser) {
             if (userJSON) {
@@ -227,7 +228,8 @@ DDUser.updateWithTokenAndExternalType = function(token, externalType, userJSON, 
             callback(ddError, ddUser);
         }
     });
-}
+}//}}}
+
 //error
 DDUser.ERROR_USER_NOT_FOUND = "EU001";
 DDUser.ERROR_USER_DB_FAIL = "EU002";
