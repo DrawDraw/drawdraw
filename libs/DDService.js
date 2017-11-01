@@ -44,4 +44,21 @@ DDService.createUserWithExternalInfo = function (token, externalType, callback) 
 
     return ;
 }//}}}
+
+DDService.updateUserWithTokenAndExternalType = function (token, externalType, userJSON, callback) 
+{//{{{
+    DDUser.updateWithTokenAndExternalType(token, externalType, userJSON, function (ddError, ddUser) {
+        var errorJSON;
+        var userJSON;
+        if (ddError) {
+            errorJSON = ddError.toJSON();
+        } 
+        if (ddUser) {
+            userJSON = ddUser.toJSON();
+        } 
+        callback(errorJSON, userJSON);
+    });
+
+    return ;
+}//}}}
 module.exports = DDService;
