@@ -32,13 +32,13 @@ var DDUser = function (id, name, imageUrl, externalType, externalId, createTimeS
                             ssl: true,
                            });
         client.connect();
-        const text = 'update users set name = $1, imageUrl = $2, where id = $3'
+        const text = 'update users set name = $1, imageUrl = $2 where id = $3'
         const values = [this.name, this.imageUrl, this.id];
         client.query(text, values, (err, res) => {
             if (err) {
                 callback(new DDError(DDUser.ERROR_USER_DB_FAIL, "DB WRITE USER FAIL"), null);
             } else {
-                callback(err, true);
+                callback(err, this);
             }
             client.end();
         });
@@ -208,7 +208,26 @@ DDUser.queryWithTokenAndExternalType = function (token, externalType, callback /
         callback(new DDError(DDUser.ERROR_USER_PARAMETERS_VALIDATE_FAIL, "externalType "+ externalType +" not support"), null);
     }
 }//}}}
-
+DDUser.updateWithTokenAndExternalType = function(token, externalType, userJSON, callback /*(err, dduser)*/) 
+{
+    DDUser.queryWithTokenAndExternalType(token, externalType, function (ddError, ddUser) {
+        if (ddUser) {
+            if (userJSON) {
+                if (userJSON.name) {
+                    ddUser.name = userJSON.name;
+                }
+                if (userJSON.imageUrl) {
+                    ddUser.imageUrl = userJSON.imageUrl;
+                }
+                ddUser.save(callback);
+            } else {
+                callback(null, ddUser);
+            }
+        } else {
+            callback(ddError, ddUser);
+        }
+    });
+}
 //error
 DDUser.ERROR_USER_NOT_FOUND = "EU001";
 DDUser.ERROR_USER_DB_FAIL = "EU002";
