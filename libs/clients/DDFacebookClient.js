@@ -11,7 +11,6 @@ DDFacebookClient.getUserIdAndName = function (token, callback/* function(error, 
     var request = require('request');
     request('https://graph.facebook.com/v2.10/me?fields=id,name&access_token='+ token, 
             function (error, response, body) {
-                console.log('error:', error); // Print the error if one occurred
                 if (error) {
                     callback(error, null);
                 } else if (response && response.statusCode && (response.statusCode >= 200 && response.statusCode < 400)) {
@@ -34,7 +33,6 @@ DDFacebookClient.getUserPicture = function (token, callback/* function(error, re
     var request = require('request');
     request('https://graph.facebook.com/v2.10/10214188198917458/picture?access_token=' + token + "&redirect=false&height=300", 
              function (error, response, pictureBody) {
-                 console.log('error:', error); // Print the error if one occurred
                  if (error) {
                      callback(error, null);
                  } else if (response && response.statusCode && (response.statusCode >= 200 && response.statusCode < 400)) {
